@@ -237,6 +237,9 @@ local function GuiListIterate()
 	local count;
 	local entries, count = GetElementList();
 
+	-- ADD THIS SAFETY CHECK:
+	if count == nil or entries == nil then return end
+
 	ramIdx = -1;
 
 	for i=0, count do
@@ -251,7 +254,6 @@ local function GuiListIterate()
 		if behaviour then
 			ManipulateElement(behaviour);
 		end
-
 
 		::continue::
 	end
@@ -310,7 +312,7 @@ local function HandleSubPanel(behaviour, subPanel, subPanelName)
 	set_Scale:call(tp, subPanel.vectorScale);
 end
 
-local function ManipulateElement(guiBehaviour)
+function ManipulateElement(guiBehaviour)
 
 	local typeString = guiBehaviour:get_type_definition():get_full_name();
 
@@ -743,39 +745,12 @@ if modUI then
 end
 
 
--- re.on_application_entry("RenderGUI", function()
--- 	GuiListIterate();
--- end)
+ re.on_application_entry("RenderGUI", function()
+ 	GuiListIterate();
+ end)
 
-
-re.on_pre_application_entry("PreupdateGUI", function()
+ re.on_pre_application_entry("PreupdateGUI", function()
 	uiOpen = false;
-end)
-
-local drawElementBehaviour;
-local drawGameObject;
-re.on_pre_gui_draw_element(function(element, context)
-
-	drawGameObject = get_GameObject:call(element);
-	if drawGameObject == nil then return true end;
-
-
-	--not really sure which is faster with this
-	--dunno if getcomponent is slow or not vs just getting the array of components
-	--probably doesnt really matter but who knows
-	--but it feels like itd be slower to do get_elements and iterate all the components
-	--though I also dunno what get_elements() actually does.
-	--I just hope none of this allocates a bunch of garbage but its really hard to know
-
-    -- local components = get_Components:call(gui_game_object):get_elements();
-    -- for i, component in ipairs(components) do
-	-- 	ManipulateElement(component);
-    -- end
-
-	drawElementBehaviour = getComponent:call(drawGameObject, behaviourTypeSystem);
-	if drawElementBehaviour then
-		ManipulateElement(drawElementBehaviour);
-	end
 end)
 
 
